@@ -9,9 +9,9 @@ class State:
         self.actions = actions if actions is not None else []  # Actions list with default value if not provided.
         self.value = value
     
-    def add_action(self, action, reward, state):
+    def add_action(self, action, reward, state, probability):
         # Method to add an action with its associated reward and next state to the state's actions list.
-        self.actions.append((action, reward, state))
+        self.actions.append((action, reward, state, probability))
 
     def choose_random_action(self):
         # Method to choose a random action from the state's actions list.
@@ -43,30 +43,66 @@ class MDP:
         s9 = State(9, 'TD 10a')
         s10 = State(10, 'TERMINAL')
 
-        s0.add_action('P', 2, s1)
-        s0.add_action('R', 0, s2)
-        s0.add_action('S', -1, s3)
+        s0.add_action('P', 2, s1, .33)
+        s0.add_action('R', 0, s2, .33)
+        s0.add_action('S', -1, s3, .33)
 
-        s1.add_action('P', 2, s7)
-        s1.add_action('R', 0, s4)
+        s1.add_action('P', 2, s7, .5)
+        s1.add_action('R', 0, s4, .5)
 
-        s2.add_action('R', 0, s4)
-        s2.add_action('P', 2, (s4, s7))
-        s2.add_action('S', -1, s5)
+        s2.add_action('R', 0, s4, .33)
+        s2.add_action('P', 2, (s4, s7), .5)
+        s2.add_action('S', -1, s5, .33)
 
-        s3.add_action('R', 0, s5)
-        s3.add_action('P', 2, (s5, s8))
+        s3.add_action('R', 0, s5, .5)
+        s3.add_action('P', 2, (s5, s8), .5)
 
-        s4.add_action('P', 2, s6)
-        s4.add_action('R', 0, s7)
-        s4.add_action('S', -1, s8)
+        s4.add_action('P', 2, s6, .33)
+        s4.add_action('R', 0, s7, .33)
+        s4.add_action('S', -1, s8, .33)
 
-        s5.add_action('R', 0, s8)
-        s5.add_action('P', 2, s9)
+        s5.add_action('R', 0, s8, .5)
+        s5.add_action('P', 2, s9, .5)
 
-        s6.add_action('any', -1, s10)
-        s7.add_action('any', 0, s10)
-        s8.add_action('any', 4, s10)
-        s9.add_action('any', 3, s10)
+        s6.add_action('any', -1, s10, 1)
+        s7.add_action('any', 0, s10, 1)
+        s8.add_action('any', 4, s10, 1)
+        s9.add_action('any', 3, s10, 1)
 
-        return [s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10]
+        return [s0,s1,s2,s3,s4,s5,s6,s7,s8,s9,s10]
+
+    def value_iteration(self, discount_factor=0.99, epsilon=0.001, max_iterations=100):
+        for iteration in range(max_iterations):
+            max_change = 0.0
+            print("iteration: ", iteration)
+
+            for state in self.states:
+                if state.id == 10:  # Terminal state
+                    continue
+
+                current_value = state.value
+
+                for action, reward, next_state, probability in state.actions:
+                    if isinstance(next_state, State):
+                        # Handle the case when next_state is a single state
+                        discounted_future_value = discount_factor * next_state.value
+                    elif isinstance(next_state, tuple):
+                        # Handle the case when next_state is a tuple of states
+                        discounted_future_value = discount_factor * max(s.value for s in next_state)
+                    
+                    current_value += probability * (reward + discounted_future_value)
+
+                value_change = abs(state.value - current_value)
+                max_change = max(max_change, value_change)
+
+                state.value = current_value
+
+            if max_change < epsilon:
+                print(f"Converged after {iteration + 1} iterations.")
+                break
+
+if __name__ == "__main__":
+    mdp = MDP()
+    mdp.value_iteration()
+
+
