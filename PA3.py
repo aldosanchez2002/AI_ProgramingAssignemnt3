@@ -64,7 +64,7 @@ def backpropagate(path, total_reward):
 
 def value_iteration(states, discount_factor=0.99, epsilon=0.001, max_iterations=100):
         iteration = 0
-        for iteration in range(5):
+        for iteration in range(100):
             print(f"Iteration: {iteration + 1}\n")
             iteration += 1
             max_change = 0.0
@@ -79,6 +79,7 @@ def value_iteration(states, discount_factor=0.99, epsilon=0.001, max_iterations=
                 print(f"  Current Value: {current_value}")
 
                 updated_state_values = []
+                best_action = None
 
                 for action, reward, next_state, probability in state.actions:
                     if isinstance(next_state, State):
@@ -96,6 +97,7 @@ def value_iteration(states, discount_factor=0.99, epsilon=0.001, max_iterations=
                     updated_value = current_value + (probability * (reward + discounted_future_value))
                     updated_state_values.append(updated_value)
                     print(f"    Updated Value: {updated_value}\n")
+                    
 
                 max_value = max(updated_state_values)
 
@@ -107,8 +109,8 @@ def value_iteration(states, discount_factor=0.99, epsilon=0.001, max_iterations=
 
                 state.value = max_value
 
-            if max_change <= epsilon:
-                print(f"Converged after {iteration} iterations.")
+            if max_change <= epsilon or iteration >= max_iterations:
+                print(f"Converged after {iteration} iterations")
                 break
 
         # Print final values of all states
@@ -116,7 +118,40 @@ def value_iteration(states, discount_factor=0.99, epsilon=0.001, max_iterations=
         for state in states:
             print(f"State: {state.name}, Value: {state.value}")
 
+def optimal_policy(states):
+    optimal_policy = []
+    states_dict = create_state_value_dict(states)
+    
+    for state in states:
+        best_action = None
+        max_value = float('-inf')  # Initialize to negative infinity
+        
+        for _, _, next_state, _ in state.actions:
+            if isinstance(next_state, tuple):
+                best_action_value = max(next_state[0].value, next_state[1].value)
+            elif isinstance(next_state, State):
+                best_action_value = next_state.value
             
+            if best_action_value > max_value:
+                max_value = best_action_value
+                best_action = states_dict[max_value]
+        
+        optimal_policy.append(best_action)
+    try:
+        for s in optimal_policy:
+            print(f"optimal policy: {s.name} Action: {s.actions[0]}")
+    except IndexError:
+            print("Terminal")  
+    return optimal_policy
+
+
+def create_state_value_dict(states):
+    state_value_dict = {}
+    for state in states:
+        state_value_dict[state.value] = state
+    return state_value_dict
+
+
 if __name__ == '__main__':
     # Creating an instance of the MDP class to initialize the Markov Decision Process.
     mdp = MDP()
@@ -124,4 +159,5 @@ if __name__ == '__main__':
     # Running the Monte Carlo simulation on the MDP states.
     monte_carlo(mdp.states)
     value_iteration(mdp.states)
+    optimal_policy(mdp.states)
 
