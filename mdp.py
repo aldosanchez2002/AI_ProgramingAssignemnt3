@@ -71,50 +71,12 @@ class MDP:
 
         return [s0,s1,s2,s3,s4,s5,s6,s7,s8,s9,s10]
 
-    def value_iteration(self, discount_factor=0.99, epsilon=0.001, max_iterations=100):
-        iteration = 0
-        for iteration in range(1):
-            max_change = 0.0
-            iteration +=1
-            print("iteration: ", iteration)
+    
 
-            for state in self.states:
-                if state.id == 10:  # Terminal state
-                    continue
 
-                current_value = state.value
-                print(f"State: {state.states_represented} Current Value {current_value}")
 
-                for action, reward, next_state, probability in state.actions:
-                    if isinstance(next_state, State):
-                        print(f"Next state of {state.states_represented} is {next_state.states_represented}")
 
-                        # Handle the case when next_state is a single state
-                        discounted_future_value = discount_factor * next_state.value
-                        print(f"Discount Future Value: {discounted_future_value}")
-                    elif isinstance(next_state, tuple):
-                        # Handle the case when next_state is a tuple of states
-                        discounted_future_value = discount_factor * max(s.value for s in next_state)
-                        print(f"Next states of {state.states_represented} is {next_state[0].states_represented}, {next_state[1].states_represented}")
-                        print(f"Discount Future Value: {discounted_future_value}")
 
-                    
-                    current_value += probability * (reward + discounted_future_value)
-                    print(f"State Name:{state.states_represented} State Value: {state.value} Current Value: {current_value}\n")
 
-                value_change = abs(state.value - current_value)
-                print(f"Value Change:  {value_change} ")
-                max_change = max(max_change, value_change)
-                print(f"max change: {max_change}")
-
-                state.value = current_value
-
-            if max_change < epsilon:
-                print(f"Converged after {iteration + 1} iterations.")
-                break
-
-if __name__ == "__main__":
-    mdp = MDP()
-    mdp.value_iteration()
 
 

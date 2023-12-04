@@ -62,11 +62,64 @@ def backpropagate(path, total_reward):
     terminal_state = path[-1][-1]
     terminal_state.value = terminal_state.value + 0.1 * (total_reward - terminal_state.value)
 
+def value_iteration(states, discount_factor=0.99, epsilon=0.001, max_iterations=100):
+        iteration = 0
+        for iteration in range(5):
+            print(f"Iteration: {iteration + 1}\n")
+            iteration += 1
+            max_change = 0.0
 
+            for state in states:
+                if state.id == 10:  # Terminal state
+                    continue
+
+                current_value = state.value
+                print()
+                print(f"State: {state.name}")
+                print(f"  Current Value: {current_value}")
+
+                updated_state_values = []
+
+                for action, reward, next_state, probability in state.actions:
+                    if isinstance(next_state, State):
+                        discounted_future_value = discount_factor * next_state.value
+                        print(f"  Action: {action}, Next State: {next_state.name}")
+                        print(f"    Discounted Future Value: {discounted_future_value}")
+                    elif isinstance(next_state, tuple):
+                        discounted_future_value = discount_factor * max(s.value for s in next_state)
+                        next_state_names = ", ".join(s.name for s in next_state)
+                        print(f"  Action: {action}, Next States: {next_state_names}")
+                        print(f"    Discounted Future Value: {discounted_future_value}")
+
+                    # Bellman Equation
+                    print(f"    Bellman Equation: {current_value} + {probability} * ({reward} + {discounted_future_value})")
+                    updated_value = current_value + (probability * (reward + discounted_future_value))
+                    updated_state_values.append(updated_value)
+                    print(f"    Updated Value: {updated_value}\n")
+
+                max_value = max(updated_state_values)
+
+                value_change = abs(max_value - current_value)
+                print(f"Max Value {max_value} - Current Value: {current_value}")
+                print(f"  Value Change: {value_change}")
+                max_change = max(max_change, value_change)
+                print(f"  Max Change: {max_change}\n")
+
+                state.value = max_value
+
+            if max_change <= epsilon:
+                print(f"Converged after {iteration} iterations.")
+                break
+
+        # Print final values of all states
+        print("\nFinal Values:")
+        for state in states:
+            print(f"State: {state.name}, Value: {state.value}")
 if __name__ == '__main__':
     # Creating an instance of the MDP class to initialize the Markov Decision Process.
     mdp = MDP()
 
     # Running the Monte Carlo simulation on the MDP states.
     monte_carlo(mdp.states)
+    value_iteration(mdp.states)
 
