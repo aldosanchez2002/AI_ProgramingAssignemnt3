@@ -1,7 +1,22 @@
 from mdp import *
 import random
 
-# Function to perform Monte Carlo simulation on the given states.
+'''
+Part I: Monte Carlo
+
+Implement a program that models the MDP above. Assume that the agent follows a 
+random equiprobable policy (i.e. the probability of picking a particular action while 
+in a given state is equal to 1 / number of actions that can be performed from that 
+state).  Run your program for 50 episodes. For each episode, have your program 
+print out the agent's sequence of experience (i.e. the ordered sequence of 
+states/actions/rewards that occur in the episode) as well as the sum of the rewards 
+received in that episode in a readable form. 
+ 
+Perform first-visit Monte-Carlo updates after each episode to update the values of all 
+states visited during the run.  Use an alpha (learning rate) value of 0.1.  Print out the 
+values of all of the states at the end of your experiment along with the average 
+reward for each episode, also in a readable form.
+'''
 def monte_carlo(states):
     # List to store average reward per episode.
     average_reward_per_episode = []
@@ -67,6 +82,18 @@ def backpropagate(path, total_reward):
     terminal_state = path[-1][-1]
     terminal_state.value = terminal_state.value + 0.1 * (total_reward - terminal_state.value)
 
+
+'''
+Part II: Value Iteration
+
+Implement the value iteration algorithm and use it to find the optimal policy for this 
+MDP.  Set all value estimates to 0 initially. Use a discount rate (lambda) of 0.99. Each 
+time you update the value of a state, print out the previous value, the new value, the 
+estimated value of each action, and the action selected. Continue to update each 
+state until the maximum change in the value of any state in a single iteration is less 
+than 0.001.  At the end, print out the number of iterations (i.e., the number of times 
+you updated each state), the final values for each state, and the final optimal policy. 
+'''
 def value_iteration(states, discount_factor=0.99, epsilon=0.001, max_iterations=100):
         iteration = 0
         for iteration in range(5):
