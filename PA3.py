@@ -115,6 +115,8 @@ def value_iteration(states, discount_factor=0.99, epsilon=0.001, max_iterations=
         print("\nFinal Values:")
         for state in states:
             print(f"State: {state.name}, Value: {state.value}")
+
+            
 if __name__ == '__main__':
     # Creating an instance of the MDP class to initialize the Markov Decision Process.
     mdp = MDP()
