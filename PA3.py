@@ -110,9 +110,6 @@ def value_iteration(states, discount_factor=0.99, epsilon=0.001, max_iterations=
                 print(f"State: {state.name}")
                 print(f"  Current Value: {current_value}")
 
-                updated_state_values = []
-                best_action = None
-
                 for action, reward, next_state, probability in state.actions:
                     if isinstance(next_state, State):
                         discounted_future_value = discount_factor * next_state.value
@@ -125,24 +122,16 @@ def value_iteration(states, discount_factor=0.99, epsilon=0.001, max_iterations=
                         print(f"    Discounted Future Value: {discounted_future_value}")
 
                     # Bellman Equation
-                    print(f"    Bellman Equation: {current_value} + {probability} * ({reward} + {discounted_future_value})")
                     updated_value = current_value + (probability * (reward + discounted_future_value))
-                    updated_state_values.append(updated_value)
                     print(f"    Updated Value: {updated_value}\n")
-                    
 
-                max_value = max(updated_state_values)
 
-                value_change = abs(max_value - current_value)
-                print(f"Max Value {max_value} - Current Value: {current_value}")
-                print(f"  Value Change: {value_change}")
+                value_change = abs(updated_value - current_value)
                 max_change = max(max_change, value_change)
-                print(f"  Max Change: {max_change}\n")
+                state.value = updated_value
 
-                state.value = max_value
-
-            if max_change <= epsilon or iteration >= max_iterations:
-                print(f"Converged after {iteration} iterations")
+            if max_change <= epsilon:
+                print(f"Converged after {iteration} iterations.")
                 break
 
         # Print final values of all states
@@ -156,19 +145,6 @@ def value_iteration(states, discount_factor=0.99, epsilon=0.001, max_iterations=
             print(f"State: {state.name}, Value: {state.value}")
         print(f"\nValue Iteration max: {max_value_state}")
 
-def optimal_policy(states):
-    optimal_policy = []
-    states_dict = create_state_value_dict(states)
-    
-    for state in states:
-        best_action = None
-        max_value = float('-inf')  # Initialize to negative infinity
-        
-        for _, _, next_state, _ in state.actions:
-            if isinstance(next_state, tuple):
-                best_action_value = max(next_state[0].value, next_state[1].value)
-            elif isinstance(next_state, State):
-                best_action_value = next_state.value
 '''
 Part III: Q-Learning 
  
@@ -250,33 +226,13 @@ def q_learning(states, discount_factor=0.99, epsilon=0.001, max_iterations=100):
         print(f"State: {state.name}, Action: {action}, Q-Value: {q_value}")
     print(f"\nQ-learning max: {max_value_state}")
             
-            if best_action_value > max_value:
-                max_value = best_action_value
-                best_action = states_dict[max_value]
-        
-        optimal_policy.append(best_action)
-    try:
-        for s in optimal_policy:
-            print(f"optimal policy: {s.name} Action: {s.actions[0]}")
-    except IndexError:
-            print("Terminal")  
-    return optimal_policy
-
-
-def create_state_value_dict(states):
-    state_value_dict = {}
-    for state in states:
-        state_value_dict[state.value] = state
-    return state_value_dict
-
-
 if __name__ == '__main__':
     # Creating an instance of the MDP class to initialize the Markov Decision Process.
     mdp = MDP()
 
     # Running the Monte Carlo simulation on the MDP states.
-    # monte_carlo(mdp.states)
-    # value_iteration(mdp.states)
+    monte_carlo(mdp.states)
+    value_iteration(mdp.states)
     q_learning(mdp.states) 
     
     '''
