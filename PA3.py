@@ -240,8 +240,8 @@ if __name__ == '__main__':
     mdp = MDP()
 
     # Running the Monte Carlo simulation on the MDP states.
-    monte_carlo(mdp.states)
-    value_iteration(mdp.states)
+    # monte_carlo(mdp.states)
+    # value_iteration(mdp.states)
     q_learning(mdp.states) 
     
     '''
